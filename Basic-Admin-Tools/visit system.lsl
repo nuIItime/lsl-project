@@ -1,11 +1,6 @@
-string webhook_url = "";
+string webhook_url = ""; //url
 
 list privacy_zone =[]; //hides the position of the agent on that particular zone "vector=radius=title"
-list known_list =[]; //flag known avatar on the sim
-
-string embed_color0 = "100000"; //known
-string embed_color1 = "16744448"; //unknown
-string embed_color2 = "16711680"; //alert
 
 integer flag = AGENT_LIST_REGION; //detect agent on the sim flag type
 integer root_sitting_show = FALSE; //false in default for privacy
@@ -15,9 +10,13 @@ integer limit_character_name = 30; //character limit 60
 integer footer_name_display = 20; //footer limit 30
 integer time_event = 3; //script runtime
 
+string embed_color2 = "16711680"; //alert
+string embed_color0 = "100000"; //enter
+string embed_color1 = "9807270"; //left
+
 list root_sitting(key avatar){list a = llGetObjectDetails(avatar,([OBJECT_ROOT]));return a;}
 string detect_bot(key avatar){if(llGetAgentInfo(avatar) & AGENT_AUTOMATED){return "1";}return "0";}
-string agent(string A){if(~llListFindList(known_list,[A])){return embed_color0;}return embed_color1;}
+string in_out(integer A){if(A == 1){return embed_color0;}return embed_color1;}
 string rootname(string a){return llDeleteSubString(a,limit_character_root_name,1000000);}
 string name(string a){return llDeleteSubString(a,limit_character_footer_name,1000000);}
 string bot(string A){if(A=="1"){return"🤖 ";}return"";}
@@ -46,23 +45,6 @@ if (secs>=86400){days=llFloor(secs/86400);secs=secs%86400;timeStr+=(string)days+
 if(secs>=3600){hours=llFloor(secs/3600);secs=secs%3600;timeStr+=(string)hours+" hour";if(hours!=1){timeStr+="s";}if(secs>0){timeStr+=", ";}}
 if(secs>=60){minutes=llFloor(secs/60);secs=secs%60;timeStr+=(string)minutes+" minute";if(minutes!=1){timeStr+="s";}if(secs>0){timeStr+=", ";}}
 if (secs>0){timeStr+=(string)secs+" second";if(secs!=1){timeStr+="s";}}return timeStr;
-}
-startup()
-{
-    llLinksetDataReset();  
-    list List = llGetAgentList(flag,[]);
-    integer Length = llGetListLength(List);
-    if (!Length){return;}else{integer x;for ( ; x < Length; x += 1)
-    {
-    list details = llGetObjectDetails(llList2String(List,x),([OBJECT_NAME,OBJECT_POS]));
-    vector ovF = llList2Vector(details,1); float a = ovF.x; float b = ovF.y; float c = ovF.z;
-    string position = "("+ (string)((integer)a)+", "+(string)((integer)b)+", "+(string)((integer)c)+")";
-
-    string Name = llDeleteSubString(llList2String(details,0),limit_character_name,1000000);
-    string Data = Name+"|"+position+"|"+detect_bot(llList2String(List,x))+"|"+llList2String(List,x)+"|"+(string)llGetUnixTime();
-    llLinksetDataWrite("data"+(string)llLinksetDataCountKeys(),Data);
-    }
-  }
 }
 data_delete(string a)
 {
@@ -93,7 +75,7 @@ integer data_check(string uuid)
       if((key)llList2String(items,3))
       {
          if(uuid == llList2String(items,3))
-         { 
+         {
          list details = llGetObjectDetails(uuid,([OBJECT_NAME,OBJECT_POS]));
          vector ovF = llList2Vector(details,1); float a = ovF.x; float b = ovF.y; float c = ovF.z;
          string position = "("+ (string)((integer)a)+", "+(string)((integer)b)+", "+(string)((integer)c)+")";
@@ -107,7 +89,7 @@ integer data_check(string uuid)
       }
    }return 0;
 }
-agententer()
+agent_IN()
 {
   list List = llGetAgentList(flag,[]);
   integer Length = llGetListLength(List);
@@ -125,7 +107,7 @@ agententer()
     }
   }
 }
-agentleft()
+agent_OUT()
 {
   integer x;
   integer Length = llLinksetDataCountKeys();
@@ -184,13 +166,13 @@ string region_avatar_list()
          list details = llGetObjectDetails(llList2Key(List, x), ([OBJECT_NAME,OBJECT_POS]));
          detect_list += name(llList2String(details,0))+" ( "+p_zone((string)llList2Vector(details,1),llList2Key(List, x))+" )"+"\n";
 } } }return "Agent : "+(string)Length+"\n"+(string)detect_list; }
-visit_logs_send(string msg,integer mode) 
+visit_logs_send(string A,integer B) 
 {
-    list items = llParseString2List(msg, ["|"], []);
+    list items = llParseString2List(A, ["|"], []);
     string detail0 = ""; 
     string detail1 = "";
 
-    if(mode == 1)
+    if(B == 1)
     {
     detail1 = "has entered the sim";
     detail0 =
@@ -198,7 +180,7 @@ visit_logs_send(string msg,integer mode)
     "Spawn Position : "+llList2String(items,1
     );
     }
-    if(mode == 2)
+    if(B == 2)
     {
     detail1 = "has left the sim";
     detail0 =
@@ -209,7 +191,7 @@ visit_logs_send(string msg,integer mode)
     }
     list json =[
     "username",llGetRegionName()+"","embeds",llList2Json(JSON_ARRAY,[llList2Json(JSON_OBJECT,[
-    "color",agent(llList2String(items,3)),"title",bot(llList2String(items,2))+llList2String(items,0),
+    "color",in_out(B),"title",bot(llList2String(items,2))+llList2String(items,0),
     "description",detail0+"\nPosted : <t:"+(string)llGetUnixTime()+":R>","url","https://world.secondlife.com/resident/"+llList2String(items,3),
     "author",llList2Json(JSON_OBJECT,["name",detail1]),
     "footer",llList2Json(JSON_OBJECT,["text",region_avatar_list()])])])];
@@ -238,11 +220,11 @@ default
     }
     on_rez(integer start_param)
     {
+    llLinksetDataReset();    
     llResetScript();
     }
     state_entry()
-    {
-    startup();
+    {  
     llSetTimerEvent(time_event);
     }
     link_message(integer sender_num, integer num, string msg, key id)
@@ -251,7 +233,8 @@ default
     }
     timer()
     {
-    agententer();
-    agentleft();
+    if(llGetFreeMemory() < 10000){llResetScript();}
+    agent_OUT();
+    agent_IN();
     }
   }
