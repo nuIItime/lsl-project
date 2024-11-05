@@ -170,7 +170,7 @@ option_topmenu()
 {
 integer music_list = (llGetInventoryNumber(INVENTORY_NOTECARD)-2)+llGetInventoryNumber(INVENTORY_SOUND)+(integer)llLinksetDataRead("uuid");
 integer page=(music_list / 9) + 1;
-llTextBox(llGetOwner(),
+llTextBox(userUUID,
 "\n"+"[ Status ]"+"\n\n"+
 "Memory = "+(string)llLinksetDataAvailable()+"\n"+
 "Sound Radius = "+(string)llDeleteSubString(check_output((float)llLinksetDataRead("r")),4,300)+"\n"+
