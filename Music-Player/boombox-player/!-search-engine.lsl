@@ -50,7 +50,7 @@ list make_list(integer a,integer b)
 }
 dialog0()
 {
-if (!num){llMessageLinked(LINK_THIS, 0,"main", ""); llOwnerSay("Could not find anything"); return;}
+if (!num){llMessageLinked(LINK_THIS, 0,"main", ""); llRegionSayTo(userUUID,0,"Could not find anything");return;}
 ichannel = llFloor(llFrand(1000000) - 100000); llListenRemove(chanhandlr); chanhandlr = llListen(ichannel, "", NULL_KEY, ""); dialog_songmenu(cur_page);
 }
 match(string a,string b){if(~llSubStringIndex(llToLower(b),llToLower(a))){llLinksetDataWrite("temp-"+(string)num,b); num = num + 1;}}
