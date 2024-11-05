@@ -6,7 +6,7 @@ string default_volume = "1";
 string default_mode = "0";
 string music_selection = "none";
 string music_song = "none";
-string  note_name;
+string note_name;
 
 key userUUID;
 
