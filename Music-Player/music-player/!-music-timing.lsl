@@ -31,7 +31,7 @@ playmusic()
   } } 
   if(safe_fail_trigger == TRUE) 
   {
-  llSay(0,"could not play [ fail-safe triggered ]"); music_timing = 0; return;   
+  llOwnerSay("could not play [ fail-safe triggered ]"); music_timing = 0; return;   
   }
   integer Length = llGetListLength(music_song);
   if (music_num < Length)
