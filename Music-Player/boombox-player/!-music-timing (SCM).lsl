@@ -9,7 +9,7 @@ sound_upload(string uuid){if((key)uuid){music_song += (list)[uuid];}else{if((flo
 length_mode_sound(float a,string b)
 {
 llLinkSetSoundRadius(LINK_THIS,(float)llLinksetDataRead("r"));
-if((key)b){if (a > 56) {llLoopSound(b,(float)llLinksetDataRead("v"));}else{llPlaySound(b,(float)llLinksetDataRead("v"));}}else{llOwnerSay("error invalid [ " +b+" ]");}
+if((key)b){if (a > 56) {llLoopSound(b,(float)llLinksetDataRead("v"));}else{llPlaySound(b,(float)llLinksetDataRead("v"));}}else{llSay(0,"error invalid [ " +b+" ]");}
 }
 playmusic()
 {
