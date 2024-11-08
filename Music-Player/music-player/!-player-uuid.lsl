@@ -11,7 +11,7 @@ key notecardKey;
 
 startup()
 {
-llLinksetDataDeleteFound("m-","");ReadNotecard();
+llLinksetDataDeleteFound("m-",""); ReadNotecard();
 llRequestPermissions(llGetOwner(),PERMISSION_TAKE_CONTROLS);
 }
 ReadNotecard()
@@ -110,8 +110,7 @@ default
         dialog0();
     } } }
     link_message(integer sender_num, integer num, string msg, key id)
-    {
-      list items = llParseString2List(msg,["="],[]);
+    { 
       if(msg == "⏪"){arrow_play_sound = FALSE;arrow_music();}
       if(msg == "⏩"){arrow_play_sound = TRUE;arrow_music();}
       if(msg == "[ reset ]"){llResetScript();}  
@@ -120,8 +119,15 @@ default
       {
       integer x = llFloor(llFrand(music)); counter = x; cur_page = (x/9)+1;   
       llMessageLinked(LINK_THIS, 0,"notecard="+llLinksetDataRead("m-"+(string)x),"");
-      llMessageLinked(LINK_THIS, 0,"main", "");
-    } }
+      llMessageLinked(LINK_THIS, 0,"main", ""); return;
+      } 
+      list x = llParseString2List(msg, ["="], []);
+      if(llList2String(x, 0) == "Search")
+      {
+      list A = llParseString2List(llList2String(x,1), ["|"], []);
+      if (llGetInventoryType(llList2String(A,0))==INVENTORY_NONE){ cur_page = ((integer)llList2String(A,2)/9)+1; return;}
+      }
+    }
     dataserver(key query_id, string data)
     {
         if (query_id == notecardQueryId)
