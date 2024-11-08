@@ -187,45 +187,47 @@ default
     }
     link_message(integer sender_num, integer num, string msg, key id)
     {
-      list params = llParseString2List(msg, ["|"], []);
-      list items0 = llParseString2List(msg, ["="], []);
-      if(llList2String(items0, 0) == "Search")
-      {
-        if (llGetInventoryType(llList2String(items0,1))==INVENTORY_NONE)
-        {
-        list A = llParseString2List(llList2String(items0,1), ["|"], []);
-        music_song = llList2String(A,1); music_selection = llList2String(A,0);
-        sound_type = 1; play_sound = TRUE;
-        playmusic(); 
-        return;
-        }
-        music_song = llList2String(items0,1); music_selection = llList2String(items0,1); 
-        if (llGetInventoryType(llList2String(items0,1))==INVENTORY_SOUND)
-        {
-        sound_type = 0; play_sound = TRUE; 
-        playmusic();
-        }else{
-        sound_type = 2; play_sound = TRUE;    
-        llMessageLinked(LINK_THIS,0,"fetch_note_rationed|"+music_selection,"");
-        } 
-      }
-      if(msg == "[autoplay]"){play_sound = TRUE;arrow_play_sound = FALSE;arrow_music_1(INVENTORY_NOTECARD);}
-      if(msg == "main"){dialog_topmenu();}
-      if(msg == "type"){type_option();}
-      if(llList2String(params, 0) == "fetch_note_rationed")
+      if(msg == "[autoplay]"){ play_sound = TRUE; arrow_play_sound = FALSE; arrow_music_1(INVENTORY_NOTECARD); return;}
+      if(msg == "main"){ dialog_topmenu(); return; }
+      if(msg == "type"){ type_option(); return; }
+      list k = llParseString2List(msg, ["|"], []);
+      list x = llParseString2List(msg, ["="], []);
+      if(llList2String(k, 0) == "fetch_note_rationed")
       {
       play_sound = TRUE; llMessageLinked(LINK_THIS,0,"erase", NULL_KEY);
-      string nname = llDumpList2String(llList2ListStrided(params, 1, -1, 1), " ");
+      string nname = llDumpList2String(llList2ListStrided(k, 1, -1, 1), " ");
       if(readnote(nname) == 0){ llOwnerSay("error could not find notecard"); }
       sound_type = 2; llOwnerSay(" Playing [ " + music_selection+" ]");
       }
-      if((string)llList2String(items0,0) == "notecard")
+      if((string)llList2String(x,0) == "notecard")
       {
       sound_type = 1; play_sound = TRUE;
-      list items1 = llParseString2List(llList2String(items0,1), ["|"], []);  
+      list items1 = llParseString2List(llList2String(x,1), ["|"], []);  
       music_selection = llList2String(items1,0); music_song = llList2String(items1,1); 
-      playmusic(); if((string)llList2String(items0,2) == "menu"){dialog_topmenu();}
-    } }
+      playmusic(); if((string)llList2String(x,2) == "menu"){dialog_topmenu();}
+      } 
+      if(llList2String(x,0) == "Search")
+      {
+        list A = llParseString2List(llList2String(x,1), ["|"], []);
+        if (llGetInventoryType(llList2String(A,0))==INVENTORY_NONE)
+        { 
+        music_song = llList2String(A,1); music_selection = llList2String(A,0);
+        sound_type = 1; play_sound = TRUE; playmusic();
+        return;
+        }
+        if (llGetInventoryType(llList2String(A,0))==INVENTORY_SOUND)
+        {
+        music_song = llList2String(A,0); music_selection = llList2String(A,0);  
+        sound_type = 0; play_sound = TRUE; cur_page = ((integer)llList2String(A,1)/9)+1; playmusic();
+        return;
+        }
+        if (llGetInventoryType(llList2String(A,0))==INVENTORY_NOTECARD)
+        {
+        music_song = llList2String(A,0); music_selection = llList2String(A,0);   
+        sound_type = 2; play_sound = TRUE; cur_page0 = ((integer)llList2String(A,1)/9)+1; 
+        llMessageLinked(LINK_THIS,0,"fetch_note_rationed|"+music_selection,"");
+        return;
+    } } }
     listen(integer chan, string sname, key skey, string text)
     {
     list items0 = llParseString2List(text, ["/"], []);
