@@ -217,14 +217,14 @@ default
         }
         if (llGetInventoryType(llList2String(A,0))==INVENTORY_SOUND)
         {
-        music_song = llList2String(A,0); music_selection = llList2String(A,0);  
-        sound_type = 0; play_sound = TRUE; cur_page = ((integer)llList2String(A,1)/9)+1; playmusic();
+        music_song = llList2String(A,0); music_selection = llList2String(A,0); 
+        sound_type = 0; play_sound = TRUE; counter = (integer)llList2String(A,1); cur_page = ((integer)llList2String(A,1)/9)+1; playmusic();
         return;
         }
         if (llGetInventoryType(llList2String(A,0))==INVENTORY_NOTECARD)
         {
         music_song = llList2String(A,0); music_selection = llList2String(A,0);   
-        sound_type = 2; play_sound = TRUE; cur_page0 = ((integer)llList2String(A,1)/9)+1; 
+        sound_type = 2; play_sound = TRUE; counte = (integer)llList2String(A,1); cur_page0 = ((integer)llList2String(A,1)/9)+1; 
         llMessageLinked(LINK_THIS,0,"fetch_note_rationed|"+music_selection,"");
         return;
     } } }
