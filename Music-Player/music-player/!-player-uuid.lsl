@@ -125,7 +125,7 @@ default
       if(llList2String(x, 0) == "Search")
       {
       list A = llParseString2List(llList2String(x,1), ["|"], []);
-      if (llGetInventoryType(llList2String(A,0))==INVENTORY_NONE){ cur_page = ((integer)llList2String(A,2)/9)+1; return;}
+      if (llGetInventoryType(llList2String(A,0))==INVENTORY_NONE){ counter = (integer)llList2String(A,1); cur_page = ((integer)llList2String(A,2)/9)+1; return;}
       }
     }
     dataserver(key query_id, string data)
