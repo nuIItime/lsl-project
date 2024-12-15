@@ -518,6 +518,15 @@ ac9c02b2-cf6d-4386-bacc-f8695f935a67=ChrisBowen Resident
 cc458989-3519-4c77-8a41-8c1695e16033=LilShades Resident
 238bf539-3a09-4c6b-9ad5-a977ff7ae489=nulge Resident
 7fd60b6e-4dd4-4923-a818-9426bd8b7666=LibbyCoker Resident
+678ea500-1ae6-4d06-989c-854015b4a90f=MadisonCyberneticsMorphology Resident
+42aa97b9-3e55-4625-af4a-919429d88429=MadisonCyberneticsMach Residen
+0af54bc8-e7d1-415c-a8b4-b6db660de7a7=MadisonCyberneticsTonicity Residen
+fc3e3ab3-29a2-43d9-ba28-46e104278374=MadisonCyberneticsAlkali Residen
+6e58f5a8-a866-45c6-a0ec-8e6d787dd5bf=MadisonCyberneticsAmphetamine Residen
+d2c47a8d-ce5f-49b3-95ee-e96290e44977=Interlo Leeeroy
+3223b92c-d8d4-4824-9c77-d4b4bf3ea843=MadisonCyberneticsAlkaliMetal Residen
+4adc75f8-c331-4644-990b-08cd2302364b=MadisonCyberneticsAurora Residen
+2c01cedb-1b74-4646-8f13-aba457b42bee=MadisonCyberneticsAvatar Residen
 
 
 
