@@ -1,0 +1,57 @@
+list parcel_list;
+
+integer region_size = 256;
+integer height_scan = 1;
+integer steps = 5;
+
+string flag_parcel(vector pos)
+{
+   string result;
+   if ((llGetParcelFlags(pos) & PARCEL_FLAG_ALLOW_SCRIPTS)) result+= "ALLOW_SCRIPTS\n";
+   if ((llGetParcelFlags(pos) & PARCEL_FLAG_ALLOW_DAMAGE)) result+= "ALLOW_DAMAGE\n";
+   if ((llGetParcelFlags(pos) & PARCEL_FLAG_ALLOW_TERRAFORM)) result+= "ALLOW_TERRAFORM\n";
+   if ((llGetParcelFlags(pos) & PARCEL_FLAG_ALLOW_CREATE_OBJECTS)) result+= "ALLOW_CREATE_OBJECTS\n";
+   if (result == "") return "NULL\n";
+   return result;
+}
+B(integer e)
+{
+     integer i=0;
+     for (i=0; i<region_size; i+=steps)
+     {
+               list details = llGetParcelDetails(<i,e,height_scan>,[PARCEL_DETAILS_ID,PARCEL_DETAILS_NAME,PARCEL_DETAILS_OWNER,PARCEL_DETAILS_GROUP]);
+               if (!~llListFindList(parcel_list, [llList2String(details ,0)]))
+                {
+                string region_name = llReplaceSubString(llGetRegionName()," ","%20",0);
+                string pos_url = "http://maps.secondlife.com/secondlife/"+region_name+"/"+(string)i+"/"+(string)e+"/"+(string)height_scan;
+
+                llOwnerSay("\n"+
+                "PARCEL POS = "+pos_url
+                +"\n"+
+                "PARCEL OWNER = secondlife:///app/agent/"+llList2String(details,2)+"/about"
+                +"\n"+
+                "PARCEL NAME = "+llList2String(details,1)
+                +"\n"+
+                "PARCEL GROUP = secondlife:///app/group/"+llList2String(details,3)+"/about"
+                +"\n\n"+
+                "PARCEL FLAG \n--------------------------------------\n"+
+                flag_parcel(<i,e,height_scan>)
+                +"--------------------------------------");
+
+                parcel_list += (list)llList2String(details ,0);
+                }
+        }
+}
+parcel_scan()
+{
+    integer i=0;
+    for (i=0; i<region_size; i+=steps){ B(i); }
+    parcel_list = [];
+}
+default
+{
+    touch_start(integer total_number)
+    {
+    parcel_scan();
+    }
+}
