@@ -22,8 +22,7 @@ B(integer e)
                list details = llGetParcelDetails(<i,e,height_scan>,[PARCEL_DETAILS_ID,PARCEL_DETAILS_NAME,PARCEL_DETAILS_OWNER,PARCEL_DETAILS_GROUP]);
                if (!~llListFindList(parcel_list, [llList2String(details ,0)]))
                 {
-                string region_name = llReplaceSubString(llGetRegionName()," ","%20",0);
-                string pos_url = "http://maps.secondlife.com/secondlife/"+region_name+"/"+(string)i+"/"+(string)e+"/"+(string)height_scan;
+                string pos_url = "http://maps.secondlife.com/secondlife/"+llEscapeURL(llGetRegionName())+"/"+(string)i+"/"+(string)e+"/"+(string)height_scan;
 
                 llOwnerSay("\n"+
                 "PARCEL POS = "+pos_url
