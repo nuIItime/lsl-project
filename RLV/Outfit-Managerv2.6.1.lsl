@@ -34,6 +34,7 @@ integer num;
 key keyConfigQueryhandle;
 key keyConfigUUID;
 
+string search_sample = "\n\nsearch sample : coffee or coffee+tea\n";
 string note_name;
 string select;
 
@@ -98,17 +99,35 @@ readnote(string notename)
     if(detach_all == TRUE){detach_attachment();}
     keyConfigQueryhandle = llGetNotecardLine(note_name, intLine1); 
     keyConfigUUID = llGetInventoryKey(note_name);
+    llOwnerSay("load = "+notename);
     }
 }
-match(string a,string b,integer c){if(~llSubStringIndex(llToLower(b),llToLower(a))){llLinksetDataWrite("temp-"+(string)num,b); num = num + 1;}}
+match(string a,string b,integer c)
+{
+    if(~llSubStringIndex(llToLower(b),llToLower(a)))
+    {
+    llLinksetDataWrite("temp-"+(string)num,b); 
+    num = num + 1;
+    }
+}
 search_engine(string search)
 {
   num=0;
+  integer c;
+  list items = llParseString2List(search,["+"],[]);   
+  integer Length = llGetListLength(items);   
+  if (!Length)
+  { 
   integer x;
-  for( ; x < llGetInventoryNumber(INVENTORY_NOTECARD); x += 1)
+  for( ; x < llGetInventoryNumber(INVENTORY_NOTECARD); x += 1){ match(search,llGetInventoryName(INVENTORY_NOTECARD,x),x); } 
+  dialog5(); 
+  return;
+  }
+  for ( ; c < Length; c += 1)
   {
-  match(search,llGetInventoryName(INVENTORY_NOTECARD,x),x);
-  } 
+  integer x;
+  for( ; x < llGetInventoryNumber(INVENTORY_NOTECARD); x += 1){ match(llList2String(items,c),llGetInventoryName(INVENTORY_NOTECARD,x),x); } 
+  }
   dialog5();
 }
 detach_attachment()
@@ -139,9 +158,9 @@ dialog1()
 if(llGetInventoryKey(select) == NULL_KEY){ dialog2();return;} random();
 llDialog(llGetOwner(),llDeleteSubString(select,25,1000),["[ add ]","[ replace ]","[ detach ]","[  ❌  ]","[  ☰  ]","[  ←  ]"],ichannel);
 }
-dialog2(){random(); search = FALSE; llDialog(llGetOwner(),"menu\n\n",["[  🔍  ]","[  📋  ]","[  ⚠️  ]","[  ❌  ]"],ichannel);}
+dialog2(){random(); search = FALSE; llDialog(llGetOwner(),"menu\n\n",["[  🔍  ]","[  📋  ]","[  ⚠️  ]","[  ❌  ]","...","[  →  ]"],ichannel);}
 dialog3(){random(); search = FALSE; llDialog(llGetOwner(),"confirmation.\n\nDo you want to detach everything?",["[ yes ]","[ no ]"],ichannel);}
-dialog4(){random(); search = TRUE; llLinksetDataDeleteFound("temp-",""); llTextBox(llGetOwner(),"search",ichannel);}
+dialog4(){random(); search = TRUE; llLinksetDataDeleteFound("temp-",""); llTextBox(llGetOwner(),"search\n"+search_sample,ichannel);}
 dialog5(){random(); if(!num){llOwnerSay("Could not find anything"); dialog2(); return;} cur_page = 1; dialog_songmenu(cur_page);}
 default
 {
@@ -169,13 +188,14 @@ default
         if(text == "[  🔍  ]"){dialog4(); return;}
         if(text == "[  ☰  ]"){dialog2();return;}
         if(text == "[  ←  ]"){dialog0();return;}
+        if(text == "[  →  ]"){dialog1();return;}
         
         if(text == "..."){dialog2();return;}
         if(text == ">>>"){dialog_songmenu(cur_page+1);return;}
         if(text == "<<<"){dialog_songmenu(cur_page-1);return;}
         list items = llParseString2List(text, ["'"], []);
         if(llList2String(items,1) == "゜")
-        {    
+        {
            if(search == FALSE)
            {
            select = llGetInventoryName(INVENTORY_NOTECARD,(integer)llList2String(items,0));
