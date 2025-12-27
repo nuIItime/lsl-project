@@ -1,5 +1,26 @@
-integer ichannel = 5215;
-integer delay_load = 1;
+/*
+-------------------------------------
+notecard configuration format sample.
+-------------------------------------
+Avatar/jack/parts=outfit # Load every outfit in that directory, Useful for universal multilayer's.
+Avatar/jack/parts # Load every content in that directory.
+Avatar/jack/parts=attach # Optional
+Avatar/jack/parts=detach # Optional
+delay=1 # Useful for slowing down fast load.
+-------------------------------------
+Avatar/jack/parts=attach
+delay=1
+Avatar/jack/parts=detach
+-------------------------------------
+Avatar/jack/shape&skin=outfit
+delay=1
+Avatar/jack/parts
+delay=1
+AO/jack/default
+-------------------------------------
+*/
+
+integer ichannel = 1001;
 integer search = FALSE;
 integer attach_option;
 integer cur_page = 1;
@@ -106,10 +127,10 @@ attachment(string a)
   if(attach_option == TRUE)
   { 
   llOwnerSay("@attachover:"+a+"=force");
-  llOwnerSay("attaching = "+a+"/");
+  llOwnerSay("attaching = "+a);
   }else{
   llOwnerSay("@detach:"+a+"=force");
-  llOwnerSay("detaching = "+a+"/");
+  llOwnerSay("detaching = "+a);
   }
 }
 dialog0(){random(); dialog_songmenu(cur_page);}
@@ -173,14 +194,48 @@ default
   }
   dataserver(key keyQueryId, string strData)
   {
-        if (keyQueryId == keyConfigQueryhandle)
-        {
-            if (strData == EOF){llMessageLinked(LINK_THIS,0,"start", NULL_KEY);}else
-            {
-            keyConfigQueryhandle = llGetNotecardLine(note_name, ++intLine1);
-            strData = llStringTrim(strData, STRING_TRIM_HEAD);
-            if (llGetSubString (strData, 0, 0) != "#"){ attachment(strData); llSleep(delay_load);}
+  if (keyQueryId == keyConfigQueryhandle)
+  {
+     if (strData == EOF){ llOwnerSay("done loading notecard."); }else
+     {
+         keyConfigQueryhandle = llGetNotecardLine(note_name, ++intLine1);
+         strData = llStringTrim(strData, STRING_TRIM_HEAD);
+         if (llGetSubString (strData, 0, 0) != "#")
+         {
+               list items = llParseString2List(strData,["="],[]); 
+               if(llList2String(items,0) != "delay")
+               {
+                  if(llList2String(items,1) == "outfit")
+                  {
+                     if(attach_option != TRUE){ attachment(llList2String(items,0));}else
+                     {
+                     llOwnerSay("@addoutfit:"+llList2String(items,0)+"=force");
+                     llOwnerSay("addoutfit = "+llList2String(items,0));
+                     }
+                  }
+                  else if(llList2String(items,1) == "attach")
+                  {
+                     if(attach_option == TRUE)
+                     { 
+                     llOwnerSay("@attachover:"+llList2String(items,0)+"=force");
+                     llOwnerSay("auto_attach = "+llList2String(items,0));
+                     }
+                  }
+                  else if(llList2String(items,1) == "detach")
+                  {
+                     if(attach_option == TRUE)
+                     { 
+                     llOwnerSay("@detach:"+llList2String(items,0)+"=force");
+                     llOwnerSay("auto_detach = "+llList2String(items,0));
+                     }
+                  }else{
+                  attachment(strData); 
+                  }
+               }else{ 
+               if(attach_option == TRUE){ llSleep((float)llList2String(items,1)); }
+               }
             }
          }
       }
    }
+}
