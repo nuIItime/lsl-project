@@ -205,7 +205,7 @@ detach_previous_outfit()
 load_outfit()
 {
   integer c;
-  if(detach_all == FALSE){ detach_previous_outfit(); if(pause == TRUE){ llSleep(2.5); } }
+  if(detach_all == FALSE){ detach_previous_outfit(); if(pause == TRUE){ llSleep(3); } }
   for ( ; c < outfit_list; c += 1)
   {
         string strData = llLinksetDataRead("outfit-"+(string)c); 
@@ -318,3 +318,4 @@ default
       }
    }
 }
+
