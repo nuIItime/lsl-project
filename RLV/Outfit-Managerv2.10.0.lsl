@@ -52,7 +52,7 @@ dialog0(){random(); dialog_songmenu(cur_page);}
 dialog1()
 {
 if(llGetInventoryKey(select) == NULL_KEY){ dialog2();return;} random();
-llDialog(llGetOwner(),llDeleteSubString(select,100,1000),["[ add ]","[ apply ]","[ sync ]","[ detach ]","[ replace ]","[ detach all ]","[  ❌  ]","[  ☰  ]","[  ←  ]"],ichannel);}
+llDialog(llGetOwner(),llDeleteSubString(select,100,1000),["[ add ]","[ apply ]","[ detach ]","[ sync ]","[ replace ]","[ detach all ]","[  ❌  ]","[  ☰  ]","[  ←  ]"],ichannel);}
 dialog2(){random(); llDialog(llGetOwner(),"menu\n\n",[search_status(),"[  📋  ]","[  ☢️  ]","[  ❌  ]","⋯","[  →  ]"],ichannel);}
 dialog3(){random(); llDialog(llGetOwner(),"confirmation.\n\nDo you want to detach everything?",["[ yes ]","[ no ]"],ichannel);}
 dialog4(){random(); llLinksetDataDeleteFound("search-",""); llTextBox(llGetOwner(),"search\n"+search_sample,ichannel);}
