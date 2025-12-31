@@ -22,9 +22,9 @@ AO/jack/default
 
 integer ichannel = 1001;
 integer attach_option;
+integer notecard_line;
 integer cur_page = 1;
 integer chanhandlr;
-integer intLine1;
 
 integer page0;
 integer page1;
@@ -37,26 +37,85 @@ integer previous_list;
 integer search_count;
 integer outfit_list;
 
-key keyConfigQueryhandle;
-key keyConfigUUID;
-
 string search_sample = "\n\nsearch sample : coffee or coffee+tea\n";
-string note_name;
 string select;
 
-random(){ichannel = llFloor(llFrand(1000000) - 100000); llListenRemove(chanhandlr); chanhandlr = llListen(ichannel, "", NULL_KEY, "");}
-string search_status(){if(search==TRUE){return"[  🚫  ]";}return"[  🔍  ]";}
-integer ignore(string a){if(a=="delay"){return FALSE;}return TRUE;}
-dialog0(){random(); dialog_songmenu(cur_page);}
+key key_notecard_query;
+
+string search_status()
+{
+  if(search==TRUE)
+  {
+  return"[  🚫  ]";
+  }
+  return"[  🔍  ]";
+}
+integer ignore(string a)
+{
+  if(a=="delay")
+  {
+  return FALSE;
+  }
+  return TRUE;
+}
+random()
+{ 
+ichannel = llFloor(llFrand(1000000) - 100000); 
+llListenRemove(chanhandlr); 
+chanhandlr = llListen(ichannel, "", NULL_KEY, ""); 
+}
+dialog0()
+{
+random(); 
+dialog_songmenu(cur_page);
+}
 dialog1()
 {
-if(llGetInventoryKey(select) == NULL_KEY){ dialog2();return;} random();
-llDialog(llGetOwner(),llDeleteSubString(select,100,1000),["[ add ]","[ apply ]","[ detach ]","[ sync ]","[ replace ]","[ detach all ]","[  ❌  ]","[  ☰  ]","[  ←  ]"],ichannel);}
-dialog2(){random(); llDialog(llGetOwner(),"menu\n\n",[search_status(),"[  📋  ]","[  ☢️  ]","[  ❌  ]","⋯","[  →  ]"],ichannel);}
-dialog3(){random(); llDialog(llGetOwner(),"confirmation.\n\nDo you want to detach everything?",["[ yes ]","[ no ]"],ichannel);}
-dialog4(){random(); llLinksetDataDeleteFound("search-",""); llTextBox(llGetOwner(),"search\n"+search_sample,ichannel);}
-dialog5(){random(); if(!search_count){llOwnerSay("Could not find anything"); dialog2(); return;} search = TRUE; cur_page = 1; dialog_songmenu(cur_page);}
-dialog6(){random(); llDialog(llGetOwner(),"confirmation.\n\nDo you want to detach everything?",[" [ yes ] "," [ no ] "],ichannel);}
+  if(llGetInventoryKey(select) == NULL_KEY)
+  {
+  dialog2();
+  }else{
+  random();
+  llDialog(llGetOwner(),"selection\n\n"+
+  "name - "+llDeleteSubString(select,35,1000)+"\n\n"+
+  "description\n"+llDeleteSubString(llGetInventoryDesc(select),120,1000)+"\n"
+  ,["[ add ]","[ apply ]","[ detach ]",
+  "[ sync ]","[ replace ]","[ detach all ]",
+  "[  ❌  ]","[  ☰  ]","[  ←  ]"],ichannel);
+  }
+}
+dialog2()
+{
+random(); 
+llDialog(llGetOwner(),"menu\n\n",[search_status(),"[  📋  ]","[  ☢️  ]","[  ❌  ]","⋯","[  →  ]"],ichannel);
+}
+dialog3()
+{
+random(); 
+llDialog(llGetOwner(),"confirmation.\n\nDo you want to detach everything?",["[ yes ]","[ no ]"],ichannel);
+}
+dialog4()
+{
+random(); 
+llLinksetDataDeleteFound("search-",""); llTextBox(llGetOwner(),"search\n"+search_sample,ichannel);
+}
+dialog5()
+{
+  random();
+  if(!search_count)
+  {
+  llOwnerSay("Could not find anything"); dialog2(); 
+  }else{
+  cur_page = 1; 
+  search = TRUE; 
+  dialog_songmenu(cur_page);
+  }
+}
+dialog6()
+{
+random(); 
+llDialog(llGetOwner(),"confirmation.\n\nDo you want to detach everything?",[" [ yes ] "," [ no ] "],ichannel);
+}
 list order_buttons(list buttons)
 {
 return llList2List(buttons, -3, -1) + llList2List(buttons, -6, -4) +
@@ -64,23 +123,23 @@ llList2List(buttons, -9, -7) + llList2List(buttons, -12, -10);
 }
 dialog_songmenu(integer page)
 {
-integer slist_size;
-if(search==FALSE){slist_size=llGetInventoryNumber(INVENTORY_NOTECARD);}
-if(search==TRUE){slist_size=search_count;}
-integer pag_amt = llCeil((float)slist_size / 9.0);
-if(page > pag_amt) page = 1;
-else if(page < 1) page = pag_amt;
-cur_page = page; integer songsonpage;
-if(page == pag_amt)
-songsonpage = slist_size % 9;
-if(songsonpage == 0)
-songsonpage = 9; integer fspsearch_count = (page*9)-9; list dbuf; integer i;
-for(; i < songsonpage; ++i){dbuf += [(string)(fspsearch_count+i)+"'゜"];}
-llDialog(llGetOwner(),"page - "+(string)page+"\n\n"+make_list(fspsearch_count,i),order_buttons(dbuf + ["<<<", "[  ☰  ]", ">>>"]),ichannel);
+  integer slist_size;
+  if(search==FALSE){ slist_size=llGetInventoryNumber(INVENTORY_NOTECARD); }
+  if(search==TRUE){ slist_size=search_count; }
+  integer pag_amt = llCeil((float)slist_size / 9.0);
+  if(page > pag_amt) page = 1;
+  else if(page < 1) page = pag_amt;
+  cur_page = page; integer songsonpage;
+  if(page == pag_amt)
+  songsonpage = slist_size % 9;
+  if(songsonpage == 0)
+  songsonpage = 9; integer fspsearch_count = (page*9)-9; list dbuf; integer i;
+  for(; i < songsonpage; ++i){dbuf += [(string)(fspsearch_count+i)+"'゜"];}
+  llDialog(llGetOwner(),"page - "+(string)page+"\n\n"+make_list(fspsearch_count,i),order_buttons(dbuf + ["<<<", "[  ☰  ]", ">>>"]),ichannel);
 }
 string make_list(integer a,integer b)
 {
-  string inventory;  
+  string inventory;
   if(search == TRUE)
   {
     integer i;
@@ -89,61 +148,76 @@ string make_list(integer a,integer b)
     for(i = 0; i < b; ++i)
     {
     list items = llParseString2List(llLinksetDataRead("search-"+(string)(a+i)),["|"],[]);
-    string z = llDeleteSubString(llList2String(items,0),40,1000);
+    string z = llDeleteSubString(llList2String(items,0),39,1000);
     inventory += (string)(i+a)+". "+z+"\n";
     }
   }
   if(search == FALSE)
   {
     integer i;
-    page0 = a; 
+    page0 = a;
     page1 = (a+b);
     for(i = 0; i < b; ++i)
     {
-    string name = llGetInventoryName(INVENTORY_NOTECARD,a+i);   
-    string z = llDeleteSubString(name,40,1000);
+    string name = llGetInventoryName(INVENTORY_NOTECARD,a+i);
+    string z = llDeleteSubString(name,39,1000);
     inventory += (string)(i+a)+". "+z+"\n";
     }
-  }return inventory;
+  }
+  return inventory;
 }
 readnote(string notename)
 {
-    note_name = notename;
-    if (llGetInventoryKey(note_name) == NULL_KEY)
+    if(llGetInventoryKey(notename) == NULL_KEY)
     { 
-    llOwnerSay("error could not find notecard"); 
+    llOwnerSay("Error could not find or empty."); 
     }else{
-    intLine1 = 0;
-    keyConfigQueryhandle = llGetNotecardLine(note_name, intLine1); 
-    keyConfigUUID = llGetInventoryKey(note_name);
+    notecard_line = 0;
+    key_notecard_query = llGetNotecardLine(notename,notecard_line);
     llOwnerSay("load = "+notename);
     }
 }
-match(string a,string b,integer c)
+match(string input,string item_name,string description)
 {
-    if(~llSubStringIndex(llToLower(b),llToLower(a)))
+    if(~llSubStringIndex(llToLower(item_name),llToLower(input)))
     {
-    llLinksetDataWrite("search-"+(string)search_count,b); 
+    llLinksetDataWrite("search-"+(string)search_count,item_name); 
     search_count = search_count + 1;
     }
+    else if(~llSubStringIndex(llToLower(description),llToLower(input)))
+    {
+    llLinksetDataWrite("search-"+(string)search_count,item_name); 
+    search_count = search_count + 1;
+    }else{
+    return;
+    }
 }
-search_engine(string search)
+search_engine(string input)
 {
   search_count=0;
+    
+  list items = llParseString2List(input,["+"],[]);
+  integer Length = llGetListLength(items);
   integer c;
-  list items = llParseString2List(search,["+"],[]);   
-  integer Length = llGetListLength(items);   
   if (!Length)
   { 
-  integer x;
-  for( ; x < llGetInventoryNumber(INVENTORY_NOTECARD); x += 1){ match(search,llGetInventoryName(INVENTORY_NOTECARD,x),x); } 
-  dialog5(); 
-  return;
+     integer x;
+     for( ; x < llGetInventoryNumber(INVENTORY_NOTECARD); x += 1)
+     {
+     string name = llGetInventoryName(INVENTORY_NOTECARD,x);
+     match(input,name,llGetInventoryDesc(name));
+     }
+     dialog5(); 
+     return;
   }
   for ( ; c < Length; c += 1)
   {
-  integer x;
-  for( ; x < llGetInventoryNumber(INVENTORY_NOTECARD); x += 1){ match(llList2String(items,c),llGetInventoryName(INVENTORY_NOTECARD,x),x); } 
+     integer x;
+     for( ; x < llGetInventoryNumber(INVENTORY_NOTECARD); x += 1)
+     {
+     string name = llGetInventoryName(INVENTORY_NOTECARD,x);
+     match(llList2String(items,c),name,llGetInventoryDesc(name));
+     } 
   }
   dialog5();
 }
@@ -174,15 +248,22 @@ integer match_previous(string a)
   integer c;
   for ( ; c < outfit_list; c += 1)
   {
-  string strData = llLinksetDataRead("outfit-"+(string)c);     
-  if(strData == a){ return FALSE; }
+    string strData = llLinksetDataRead("outfit-"+(string)c);     
+    if(strData == a)
+    { 
+    return FALSE; 
+    }
   }
   return TRUE;
 }
 detach_previous_outfit()
 {
   integer c;
-  if (!previous_list){ detach_attachment(); return; }
+  if (!previous_list)
+  { 
+  detach_attachment(); 
+  return; 
+  }
   for ( ; c < previous_list; c += 1)
   {
     string strData = llLinksetDataRead("previous-"+(string)c); 
@@ -202,13 +283,16 @@ detach_previous_outfit()
       }
     }
   }
-  previous_list = 0;
   llLinksetDataDeleteFound("previous-","");
+  previous_list = 0;
 }
 load_outfit()
 {
   integer c;
-  if(automatic_detach == TRUE){ detach_previous_outfit(); }
+  if(automatic_detach == TRUE)
+  { 
+  detach_previous_outfit(); 
+  }
   for ( ; c < outfit_list; c += 1)
   {
         string strData = llLinksetDataRead("outfit-"+(string)c); 
@@ -217,8 +301,10 @@ load_outfit()
         {
           if(llList2String(items,1) == "outfit")
           {
-            if(attach_option != TRUE){ attachment(llList2String(items,0));}else
-            {
+            if(attach_option != TRUE)
+            { 
+            attachment(llList2String(items,0));
+            }else{
             llOwnerSay("@addoutfit:"+llList2String(items,0)+"=force");
             llOwnerSay("add_outfit = "+llList2String(items,0));
             llLinksetDataWrite("previous-"+(string)previous_list,strData);
@@ -247,8 +333,8 @@ load_outfit()
         if(attach_option == TRUE){ llSleep((float)llList2String(items,1)); }
         }
     }
-    outfit_list = 0;
     llLinksetDataDeleteFound("outfit-","");
+    outfit_list = 0;
 }
 nuke()
 {
@@ -284,14 +370,14 @@ default
         
         if(text == " [ yes ] "){llOwnerSay("detaching all."); nuke(); detach_attachment(); dialog1(); return;}
         if(text == " [ no ] "){dialog1();return;}
-        
+
         if(text == "[ yes ]"){llOwnerSay("detaching all."); nuke(); detach_attachment(); dialog2(); return;}
         if(text == "[ no ]"){dialog2();return;}
-        
+
         if(text == "[  🚫  ]"){search = FALSE; dialog2();return;}
         if(text == " ⋯ "){dialog1();return;}
         if(text == "⋯"){dialog2();return;}
-        
+
         if(text == "[ detach all ]"){dialog6();return;}
         if(text == "[  ☰  ]"){dialog2();return;}
         if(text == "[  ☢️  ]"){dialog3();return;}
@@ -317,29 +403,49 @@ default
            dialog1();
            return;
            }
-        }
-        if(search == FALSE){if(text){search_engine(text); return;} dialog2();}
-        }
-  }
-  dataserver(key keyQueryId, string strData)
-  {
-  if(keyQueryId == keyConfigQueryhandle)
-  {
-         if(strData == EOF){ if(sync==FALSE){ load_outfit(); } llOwnerSay("finish loading."); sync=FALSE; }else
-         {
-            keyConfigQueryhandle = llGetNotecardLine(note_name,++intLine1);
-            strData = llStringTrim(strData, STRING_TRIM_HEAD); 
-            if(sync==TRUE)
-            {
-            list items = llParseString2List(strData,["="],[]);
-            if(!llGetListLength(items)){ llOwnerSay("syncing = "+strData); }else{ if(ignore(llList2String(items,0))==TRUE){llOwnerSay("syncing = "+llList2String(items,0));} }
-            llLinksetDataWrite("previous-"+(string)previous_list,strData); 
-            previous_list = previous_list + 1;
+       }
+       if(search == FALSE)
+       {
+            if(text)
+            { 
+            search_engine(text);
             }else{
-            llLinksetDataWrite("outfit-"+(string)outfit_list,strData);
-            outfit_list = outfit_list + 1;
+            dialog2();
             }
-         }
+         }  
       }
    }
-}
+   dataserver(key id, string data)
+   {
+   if(id == key_notecard_query)
+   {
+      if(data == EOF)
+      { 
+         if(sync==FALSE){ load_outfit(); } 
+         llOwnerSay("finish loading.");
+         sync=FALSE; 
+         }else{
+             key_notecard_query = llGetNotecardLine(select,++notecard_line);
+             data = llStringTrim(data, STRING_TRIM_HEAD);
+             if(sync==TRUE)
+             {
+               list items = llParseString2List(data,["="],[]);
+               if(!llGetListLength(items))
+               { 
+                 llOwnerSay("syncing = "+data); 
+               }else{
+                 if(ignore(llList2String(items,0))==TRUE)
+                 { 
+                 llOwnerSay("syncing = "+llList2String(items,0)); 
+                 } 
+               }
+               llLinksetDataWrite("previous-"+(string)previous_list,data); 
+               previous_list = previous_list + 1;
+             }else{
+             llLinksetDataWrite("outfit-"+(string)outfit_list,data);
+             outfit_list = outfit_list + 1;
+             }
+          }
+       }
+    }
+ }
