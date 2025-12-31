@@ -31,7 +31,6 @@ integer page1;
 
 integer automatic_detach;
 integer search;
-integer pause;
 integer sync;
 
 integer previous_list;
@@ -150,22 +149,21 @@ search_engine(string search)
 }
 detach_attachment()
 {
-   llOwnerSay("@detach=n");
-   llSleep(.2);
-   llOwnerSay("@detach=force");
-   llSleep(.2);
-   llOwnerSay("@remoutfit=force");
-   llSleep(.1);
-   llOwnerSay("@detach=y");
+  llOwnerSay("@detach=n");
+  llSleep(.2);
+  llOwnerSay("@detach=force");
+  llOwnerSay("@remoutfit=force");
+  llSleep(.2);
+  llOwnerSay("@detach=y");
 }
 attachment(string a)
 {
   if(attach_option == TRUE)
   { 
-  llLinksetDataWrite("previous-"+(string)previous_list,a);
-  previous_list = previous_list + 1;
   llOwnerSay("@attachover:"+a+"=force");
   llOwnerSay("attaching = "+a);
+  llLinksetDataWrite("previous-"+(string)previous_list,a);
+  previous_list = previous_list + 1;
   }else{
   llOwnerSay("@detach:"+a+"=force");
   llOwnerSay("detaching = "+a);
@@ -184,15 +182,13 @@ integer match_previous(string a)
 detach_previous_outfit()
 {
   integer c;
-  pause = FALSE;
-  if (!previous_list){detach_attachment(); return;}
+  if (!previous_list){ detach_attachment(); return; }
   for ( ; c < previous_list; c += 1)
   {
     string strData = llLinksetDataRead("previous-"+(string)c); 
     list items = llParseString2List(strData,["="],[]);
     if(match_previous(strData)==TRUE)
     {
-      pause = TRUE;
       if (!llGetListLength(items))
       {
         llOwnerSay("@detach:"+strData+"=force");
@@ -212,7 +208,7 @@ detach_previous_outfit()
 load_outfit()
 {
   integer c;
-  if(automatic_detach == TRUE){ detach_previous_outfit(); if(pause == TRUE){ llSleep(3); } }
+  if(automatic_detach == TRUE){ detach_previous_outfit(); }
   for ( ; c < outfit_list; c += 1)
   {
         string strData = llLinksetDataRead("outfit-"+(string)c); 
@@ -247,7 +243,7 @@ load_outfit()
           }else{
           attachment(strData); 
           }
-        }else{ 
+        }else{
         if(attach_option == TRUE){ llSleep((float)llList2String(items,1)); }
         }
     }
@@ -329,7 +325,7 @@ default
   {
   if(keyQueryId == keyConfigQueryhandle)
   {
-         if(strData == EOF){ if(sync==FALSE){ load_outfit(); } llOwnerSay("finish loading."); sync=FALSE;}else
+         if(strData == EOF){ if(sync==FALSE){ load_outfit(); } llOwnerSay("finish loading."); sync=FALSE; }else
          {
             keyConfigQueryhandle = llGetNotecardLine(note_name,++intLine1);
             strData = llStringTrim(strData, STRING_TRIM_HEAD); 
