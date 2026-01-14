@@ -6,16 +6,16 @@ Avatar/jack/parts=outfit # Load every outfit in that directory, Useful for unive
 Avatar/jack/parts # Load every content in that directory.
 Avatar/jack/parts=attach # Optional
 Avatar/jack/parts=detach # Optional
-delay=1 # Useful for slowing down fast load.
+1=delay # Useful for slowing down fast load.
 -------------------------------------
 Avatar/jack/parts=attach
-delay=1
+1=delay
 Avatar/jack/parts=detach
 -------------------------------------
 Avatar/jack/shape&skin=outfit
-delay=1
+1=delay
 Avatar/jack/parts
-delay=1
+1=delay
 AO/jack/default
 -------------------------------------
 */
@@ -40,6 +40,8 @@ integer outfit_list;
 string search_sample = "\n\nsearch sample : coffee or coffee+tea\n";
 string select;
 
+list ignore_command =["delay","outfit"];
+
 key key_notecard_query;
 
 string search_status()
@@ -49,14 +51,6 @@ string search_status()
   return"[  🚫  ]";
   }
   return"[  🔍  ]";
-}
-integer ignore(string a)
-{
-  if(a=="delay")
-  {
-  return FALSE;
-  }
-  return TRUE;
 }
 random()
 { 
@@ -275,7 +269,7 @@ detach_previous_outfit()
         llOwnerSay("@detach:"+strData+"=force");
         llOwnerSay("auto_detach = "+strData);
       }else{
-        if(ignore(llList2String(items,0))==TRUE)
+        if(~llListFindList(ignore_command,[llList2String(items,1)])){ }else
         {
         llOwnerSay("@detach:"+llList2String(items,0)+"=force");
         llOwnerSay("auto_detach = "+llList2String(items,0));
@@ -297,7 +291,7 @@ load_outfit()
   {
         string strData = llLinksetDataRead("outfit-"+(string)c); 
         list items = llParseString2List(strData,["="],[]);
-        if(llList2String(items,0) != "delay")
+        if(llList2String(items,1) != "delay")
         {
           if(llList2String(items,1) == "outfit")
           {
@@ -330,7 +324,7 @@ load_outfit()
           attachment(strData); 
           }
         }else{
-        if(attach_option == TRUE){ llSleep((float)llList2String(items,1)); }
+        if(attach_option == TRUE){ llSleep((float)llList2String(items,0)); }
         }
     }
     llLinksetDataDeleteFound("outfit-","");
@@ -434,7 +428,7 @@ default
                { 
                  llOwnerSay("syncing = "+data); 
                }else{
-                 if(ignore(llList2String(items,0))==TRUE)
+                 if(~llListFindList(ignore_command,[llList2String(items,1)])){ }else
                  { 
                  llOwnerSay("syncing = "+llList2String(items,0)); 
                  } 
