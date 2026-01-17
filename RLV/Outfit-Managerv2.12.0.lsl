@@ -292,6 +292,7 @@ detach_previous_outfit()
 }
 load_outfit()
 {
+  llOwnerSay("@detach=n");
   integer c;
   if(automatic_detach == TRUE)
   { 
@@ -344,6 +345,7 @@ load_outfit()
         }
     }
     llLinksetDataDeleteFound("outfit-","");
+    llOwnerSay("@detach=y");
     outfit_list = 0;
 }
 nuke()
@@ -434,7 +436,7 @@ default
          if(sync==FALSE){ load_outfit(); } 
          llOwnerSay("finish loading.");
          sync=FALSE; 
-         }else{
+      }else{
              key_notecard_query = llGetNotecardLine(select,++notecard_line);
              data = llStringTrim(data, STRING_TRIM_HEAD);
              if(sync==TRUE)
@@ -459,4 +461,3 @@ default
        }
     }
  }
-
