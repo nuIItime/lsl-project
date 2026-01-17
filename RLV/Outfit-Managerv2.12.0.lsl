@@ -19,6 +19,7 @@ Avatar/jack/parts=detach
 reset body alpha|100=command
 1=delay
 Avatar/jack/outfit
+1=delay
 hide torso|100=command
 -------------------------------------
 Avatar/jack/shape&skin=outfit
@@ -458,3 +459,4 @@ default
        }
     }
  }
+
