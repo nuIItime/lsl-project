@@ -4,13 +4,22 @@ notecard configuration format sample.
 -------------------------------------
 Avatar/jack/parts=outfit # Load every outfit in that directory, Useful for universal multilayer's.
 Avatar/jack/parts # Load every content in that directory.
+
 Avatar/jack/parts=attach # Optional
 Avatar/jack/parts=detach # Optional
+
+message|channel=command # say command when loading a notecard.
+
 1=delay # Useful for slowing down fast load.
 -------------------------------------
 Avatar/jack/parts=attach
 1=delay
 Avatar/jack/parts=detach
+-------------------------------------
+reset body alpha|100=command
+1=delay
+Avatar/jack/outfit
+hide torso|100=command
 -------------------------------------
 Avatar/jack/shape&skin=outfit
 1=delay
@@ -40,7 +49,7 @@ integer outfit_list;
 string search_sample = "\n\nsearch sample : coffee or coffee+tea\n";
 string select;
 
-list ignore_command =["delay","outfit"];
+list ignore_command =["delay","outfit","command"];
 
 key key_notecard_query;
 
@@ -320,6 +329,12 @@ load_outfit()
             llOwnerSay("@detach:"+llList2String(items,0)+"=force");
             llOwnerSay("auto_detach = "+llList2String(items,0));
             }
+          }
+          else if(llList2String(items,1) == "command")
+          {
+            list data = llParseString2List(llList2String(items,0),["|"],[]);  
+            llSay(llList2Integer(data,1),llList2String(data,0));
+            llOwnerSay("command = "+llList2String(data,0));
           }else{
           attachment(strData); 
           }
