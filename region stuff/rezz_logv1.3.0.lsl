@@ -28,7 +28,7 @@ logs_send(string id,string User_Rezz,string color)
     
     string region_info =
     "Sim Statistics"+"\n\n"+
-    "Time Dilation: "+(string)llRound((1-llGetRegionTimeDilation())*100)+"\n"+
+    "Time dilation: "+(string)llRound((1-llGetRegionTimeDilation())*100)+"\n"+
     "Fps: "+llDeleteSubString((string)llGetRegionFPS(),4,100)
     ;
 
