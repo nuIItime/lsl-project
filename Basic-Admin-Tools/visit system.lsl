@@ -1,50 +1,60 @@
 string webhook_url = ""; //url
 
-list privacy_zone =[]; //hides the position of the agent on that particular zone "vector=radius=title"
-
 integer flag = AGENT_LIST_REGION; //detect agent on the sim flag type
-integer root_sitting_show = FALSE; //false in default for privacy
 integer limit_character_footer_name = 15; //character limit 20
 integer limit_character_root_name = 15; //character limit 20
 integer limit_character_name = 30; //character limit 60
 integer footer_name_display = 20; //footer limit 30
+integer parcel_name = TRUE; //show parcel name
 integer time_event = 3; //script runtime
 
-string embed_color2 = "16711680"; //alert
 string embed_color0 = "100000"; //enter
 string embed_color1 = "9807270"; //left
+string embed_color2 = "16711680"; //alert
 
-list root_sitting(key avatar){list a = llGetObjectDetails(avatar,([OBJECT_ROOT]));return a;}
-string detect_bot(key avatar){if(llGetAgentInfo(avatar) & AGENT_AUTOMATED){return "1";}return "0";}
-string in_out(integer A){if(A == 1){return embed_color0;}return embed_color1;}
-string rootname(string a){return llDeleteSubString(a,limit_character_root_name,1000000);}
+string root_sitting(key avatar){list a = llGetObjectDetails(avatar,([OBJECT_ROOT]));return llList2String(a,0);}
+string detect_bot(key avatar){if(llGetAgentInfo(avatar) & AGENT_AUTOMATED){return "🤖";}return " ";}
 string name(string a){return llDeleteSubString(a,limit_character_footer_name,1000000);}
-string bot(string A){if(A=="1"){return"🤖 ";}return"";}
+string in_out(integer A){if(A == 1){return embed_color0;}return embed_color1;}
+string flag_list(){if(flag==AGENT_LIST_REGION){return"sim";}return"parcel";}
 
-string A_status(key avatar)
+string avatar_parcel(vector pos)
 {
-if(llGetAgentInfo(avatar) & AGENT_ON_OBJECT){ if(root_sitting_show == TRUE){return "sitting on "+rootname(llKey2Name(llList2String(root_sitting(avatar),0)));} }
-if(llGetAgentInfo(avatar) & AGENT_ON_OBJECT){ if(root_sitting_show == FALSE){return "sitting on object";} }
-if(llGetAgentInfo(avatar) & AGENT_CROUCHING){ return "crouching"; }
-if(llGetAgentInfo(avatar) & AGENT_MOUSELOOK){ return "mouse look"; }
-if(llGetAgentInfo(avatar) & AGENT_ALWAYS_RUN){ return "running"; }
-if(llGetAgentInfo(avatar) & AGENT_SITTING){ return "sitting"; }
-if(llGetAgentInfo(avatar) & AGENT_WALKING){ return "walking"; }
-if(llGetAgentInfo(avatar) & AGENT_FLYING){ return "flying"; }
-if(llGetAgentInfo(avatar) & AGENT_IN_AIR){ return "in air"; }
-if(llGetAgentInfo(avatar) & AGENT_TYPING){ return "typing"; }
-if(llGetAgentInfo(avatar) & AGENT_AUTOMATED){ return "bot"; }
-if(llGetAgentInfo(avatar) & AGENT_BUSY){ return "busy"; }
-if(llGetAgentInfo(avatar) & AGENT_AWAY){ return "afk"; }
-return "standing";
+list data0 = llGetParcelDetails(pos,[PARCEL_DETAILS_NAME]);
+return llDeleteSubString(llList2String(data0,0),30,1000000);
 }
 string getTime(integer secs)
 {
 string timeStr; integer days; integer hours; integer minutes;
-if (secs>=86400){days=llFloor(secs/86400);secs=secs%86400;timeStr+=(string)days+" day";if (days>1){timeStr+="s";}if(secs>0){timeStr+=", ";}}
+if(secs>=86400){days=llFloor(secs/86400);secs=secs%86400;timeStr+=(string)days+" day";if (days>1){timeStr+="s";}if(secs>0){timeStr+=", ";}}
 if(secs>=3600){hours=llFloor(secs/3600);secs=secs%3600;timeStr+=(string)hours+" hour";if(hours!=1){timeStr+="s";}if(secs>0){timeStr+=", ";}}
 if(secs>=60){minutes=llFloor(secs/60);secs=secs%60;timeStr+=(string)minutes+" minute";if(minutes!=1){timeStr+="s";}if(secs>0){timeStr+=", ";}}
-if (secs>0){timeStr+=(string)secs+" second";if(secs!=1){timeStr+="s";}}return timeStr;
+if(secs>0){timeStr+=(string)secs+" second";if(secs!=1){timeStr+="s";}}return timeStr;
+}
+string A_status(key avatar)
+{
+if(llGetAgentInfo(avatar) & AGENT_ON_OBJECT)
+{ 
+list a = llGetObjectDetails(root_sitting(avatar),([OBJECT_PHYSICS]));
+if(llList2Integer(a,0) == 1){ return "🚗"; }
+return "🪑"; 
+}
+
+if(llGetAgentInfo(avatar) & AGENT_SITTING){ return "🧘"; }
+
+if(llGetAgentInfo(avatar) & AGENT_ALWAYS_RUN){ return "🏃"; }
+if(llGetAgentInfo(avatar) & AGENT_MOUSELOOK){ return "👀"; }
+if(llGetAgentInfo(avatar) & AGENT_WALKING){ return "🚶"; }
+if(llGetAgentInfo(avatar) & AGENT_TYPING){ return "🗨️"; }
+
+if(llGetAgentInfo(avatar) & AGENT_AUTOMATED){ return "🤖"; }
+
+if(llGetAgentInfo(avatar) & AGENT_FLYING){ return "🪽️"; }
+if(llGetAgentInfo(avatar) & AGENT_IN_AIR){ return "🪽"; }
+
+if(llGetAgentInfo(avatar) & AGENT_BUSY){ return "⛔"; }
+if(llGetAgentInfo(avatar) & AGENT_AWAY){ return "💤"; }
+return "🧍";
 }
 data_delete(string a)
 {
@@ -131,25 +141,16 @@ agent_OUT()
       }
    }
 }
-string p_zone(string position,key ID)
+string pos_int(string position,key ID)
 {
   vector ovF = (vector)position; float a = ovF.x; float b = ovF.y; float c = ovF.z;
   string position_A = (string)((integer)a)+", "+(string)((integer)b)+", "+(string)((integer)c);
-  integer Length = llGetListLength(privacy_zone);     
-  if (!Length){ return position_A+" | "+A_status(ID); }else
-  {
-  integer x;
-  for ( ; x < Length; x += 1)
-  {
-    list items = llParseString2List(llList2String(privacy_zone, x),["="],[]);
-    float dist = llVecDist((vector)position,(vector)llList2String(items,0));
-    if(dist>llList2Integer(items,1)){ }else
-    {
-    return llList2String(items,2);
-} } } return position_A+" | "+A_status(ID); }
+  if(parcel_name==TRUE){ return position_A+" | "+avatar_parcel(ovF)+" | "+A_status(ID); }
+  return position_A+" | "+A_status(ID);
+}
 string region_avatar_list() 
 {
-   list List = llGetAgentList(AGENT_LIST_REGION,[]);
+   list List = llGetAgentList(flag,[]);
    integer Length = llGetListLength(List);
    list detect_list = [];
    if (!Length){ return "No One Detected"; }else
@@ -164,34 +165,53 @@ string region_avatar_list()
          return "Agent : "+(string)Length+"\n"+(string)detect_list;
          }else{
          list details = llGetObjectDetails(llList2Key(List, x), ([OBJECT_NAME,OBJECT_POS]));
-         detect_list += name(llList2String(details,0))+" ( "+p_zone((string)llList2Vector(details,1),llList2Key(List, x))+" )"+"\n";
-} } }return "Agent : "+(string)Length+"\n"+(string)detect_list; }
+         detect_list += name(llList2String(details,0))+" ( "+pos_int((string)llList2Vector(details,1),llList2Key(List, x))+" )"+"\n";
+         }       
+      }
+   }return "Agent : "+(string)Length+"\n"+(string)detect_list; 
+}
 visit_logs_send(string A,integer B) 
 {
-    list items = llParseString2List(A, ["|"], []);
-    string detail0 = ""; 
-    string detail1 = "";
-
+  string detail0 = ""; 
+  string detail1 = "";
+  
+  list items = llParseString2List(A, ["|"], []);
+  
+  if((key)llList2String(items,3))
+  {
     if(B == 1)
     {
-    detail1 = "has entered the sim";
+    string pos = llList2String(items,1);
+
+    pos = llReplaceSubString(pos, "(", "<", 0);   
+    pos = llReplaceSubString(pos, ")", ">", 0);
+
+    detail1 = "has entered the "+flag_list();
     detail0 =
     "Uuid : "+llList2String(items,3)+"\n"+
-    "Spawn Position : "+llList2String(items,1
-    );
+    "Spawn Position : "+llList2String(items,1)+"\n";
+    if(parcel_name==TRUE){ detail0 += "Parcel : "+avatar_parcel((vector)pos); }
+
     }
     if(B == 2)
     {
-    detail1 = "has left the sim";
+    string pos = llList2String(items,1);    
+
+    pos = llReplaceSubString(pos, "(", "", 0);   
+    pos = llReplaceSubString(pos, ")", "", 0); 
+    pos = "<"+pos+">";  
+        
+    detail1 = "has left the "+flag_list();
     detail0 =
     "Uuid : "+llList2String(items,3)+"\n"+
-    "Last Position : "+llList2String(items,1)+"\n"+
-    "Visit Time : "+getTime((integer)llList2String(items,4)
-    );
+    "Last Position : "+llList2String(items,1)+"\n";
+    if(parcel_name==TRUE){ detail0 += "Parcel : "+avatar_parcel((vector)pos)+"\n"; }
+    detail0 += "Visit Time : "+getTime((integer)llList2String(items,4));
+    
     }
     list json =[
     "username",llGetRegionName()+"","embeds",llList2Json(JSON_ARRAY,[llList2Json(JSON_OBJECT,[
-    "color",in_out(B),"title",bot(llList2String(items,2))+llList2String(items,0),
+    "color",in_out(B),"title",llList2String(items,2)+llList2String(items,0),
     "description",detail0+"\nPosted : <t:"+(string)llGetUnixTime()+":R>","url","https://world.secondlife.com/resident/"+llList2String(items,3),
     "author",llList2Json(JSON_OBJECT,["name",detail1]),
     "footer",llList2Json(JSON_OBJECT,["text",region_avatar_list()])])])];
@@ -200,6 +220,7 @@ visit_logs_send(string A,integer B)
     "application/json",HTTP_VERIFY_CERT, TRUE,HTTP_VERBOSE_THROTTLE,TRUE,
     HTTP_PRAGMA_NO_CACHE,TRUE],llList2Json(JSON_OBJECT,json));
     llSleep(.5);
+  }
 }
 alert_log(string Message)
 {
@@ -216,25 +237,30 @@ default
 {
     changed(integer change)
     {
-    if (change & CHANGED_REGION_START){alert_log("Region_Restart : "+llGetDate()); llResetScript();}
+      if (change & CHANGED_REGION_START)
+      {
+      agent_OUT();    
+      alert_log("Region_Restart : "+llGetDate()); 
+      llResetScript();
+      }
     }
     on_rez(integer start_param)
     {
-    llLinksetDataReset();    
     llResetScript();
     }
     state_entry()
-    {  
+    {
+    llLinksetDataReset();    
     llSetTimerEvent(time_event);
     }
     link_message(integer sender_num, integer num, string msg, key id)
     {
-    if(num == 5){alert_log(msg);}
+    if(num == 5){ alert_log(msg); }
     }
     timer()
     {
-    if(llGetFreeMemory() < 10000){llResetScript();}
+    if(llGetFreeMemory() < 10000){ agent_OUT(); llResetScript(); }
     agent_OUT();
     agent_IN();
     }
-  }
+}
