@@ -5,7 +5,7 @@ integer limit_character_footer_name = 15; //character limit 20
 integer limit_character_root_name = 15; //character limit 20
 integer limit_character_name = 30; //character limit 60
 integer footer_name_display = 20; //footer limit 30
-integer footer_parcel_name = TRUE; //show parcel name
+integer footer_parcel_name = TRUE; //show footer parcel name
 integer parcel_name = TRUE; //show parcel name
 integer time_event = 3; //script runtime
 
