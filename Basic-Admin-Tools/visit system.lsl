@@ -5,6 +5,7 @@ integer limit_character_footer_name = 15; //character limit 20
 integer limit_character_root_name = 15; //character limit 20
 integer limit_character_name = 30; //character limit 60
 integer footer_name_display = 20; //footer limit 30
+integer footer_parcel_name = TRUE; //show parcel name
 integer parcel_name = TRUE; //show parcel name
 integer time_event = 3; //script runtime
 
@@ -13,7 +14,7 @@ string embed_color1 = "9807270"; //left
 string embed_color2 = "16711680"; //alert
 
 string root_sitting(key avatar){list a = llGetObjectDetails(avatar,([OBJECT_ROOT]));return llList2String(a,0);}
-string detect_bot(key avatar){if(llGetAgentInfo(avatar) & AGENT_AUTOMATED){return "🤖";}return " ";}
+string detect_bot(key avatar){if(llGetAgentInfo(avatar) & AGENT_AUTOMATED){return "🤖 ";}return " ";}
 string name(string a){return llDeleteSubString(a,limit_character_footer_name,1000000);}
 string in_out(integer A){if(A == 1){return embed_color0;}return embed_color1;}
 string flag_list(){if(flag==AGENT_LIST_REGION){return"sim";}return"parcel";}
@@ -145,7 +146,7 @@ string pos_int(string position,key ID)
 {
   vector ovF = (vector)position; float a = ovF.x; float b = ovF.y; float c = ovF.z;
   string position_A = (string)((integer)a)+", "+(string)((integer)b)+", "+(string)((integer)c);
-  if(parcel_name==TRUE){ return position_A+" | "+avatar_parcel(ovF)+" | "+A_status(ID); }
+  if(footer_parcel_name==TRUE){ return position_A+" | "+avatar_parcel(ovF)+" | "+A_status(ID); }
   return position_A+" | "+A_status(ID);
 }
 string region_avatar_list() 
@@ -170,48 +171,38 @@ string region_avatar_list()
       }
    }return "Agent : "+(string)Length+"\n"+(string)detect_list; 
 }
-visit_logs_send(string A,integer B) 
+visit_logs_send(string data,integer visit) 
 {
   string detail0 = ""; 
   string detail1 = "";
   
-  list items = llParseString2List(A, ["|"], []);
+  list items = llParseString2List(data,["|"],[]);
   
   if((key)llList2String(items,3))
   {
-    if(B == 1)
-    {
     string pos = llList2String(items,1);
 
     pos = llReplaceSubString(pos, "(", "<", 0);   
     pos = llReplaceSubString(pos, ")", ">", 0);
-
-    detail1 = "has entered the "+flag_list();
-    detail0 =
-    "Uuid : "+llList2String(items,3)+"\n"+
-    "Spawn Position : "+llList2String(items,1)+"\n";
-    if(parcel_name==TRUE){ detail0 += "Parcel : "+avatar_parcel((vector)pos); }
-
-    }
-    if(B == 2)
-    {
-    string pos = llList2String(items,1);    
-
-    pos = llReplaceSubString(pos, "(", "", 0);   
-    pos = llReplaceSubString(pos, ")", "", 0); 
-    pos = "<"+pos+">";  
-        
-    detail1 = "has left the "+flag_list();
-    detail0 =
-    "Uuid : "+llList2String(items,3)+"\n"+
-    "Last Position : "+llList2String(items,1)+"\n";
-    if(parcel_name==TRUE){ detail0 += "Parcel : "+avatar_parcel((vector)pos)+"\n"; }
-    detail0 += "Visit Time : "+getTime((integer)llList2String(items,4));
     
+    if(visit == 1)
+    {
+      detail1 = "has entered the "+flag_list();
+      detail0 += "Uuid : "+llList2String(items,3)+"\n";
+      detail0 += "Spawn Position : "+llList2String(items,1)+"\n";
+      if(parcel_name==TRUE){ detail0 += "Parcel : "+avatar_parcel((vector)pos); }
+    }
+    if(visit == 2)
+    {
+      detail1 = "has left the "+flag_list();
+      detail0 += "Uuid : "+llList2String(items,3)+"\n";
+      detail0 += "Last Position : "+llList2String(items,1)+"\n";
+      if(parcel_name==TRUE){ detail0 += "Parcel : "+avatar_parcel((vector)pos)+"\n"; }
+      detail0 += "Visit Time : "+getTime((integer)llList2String(items,4));
     }
     list json =[
     "username",llGetRegionName()+"","embeds",llList2Json(JSON_ARRAY,[llList2Json(JSON_OBJECT,[
-    "color",in_out(B),"title",llList2String(items,2)+llList2String(items,0),
+    "color",in_out(visit),"title",llList2String(items,2)+llList2String(items,0),
     "description",detail0+"\nPosted : <t:"+(string)llGetUnixTime()+":R>","url","https://world.secondlife.com/resident/"+llList2String(items,3),
     "author",llList2Json(JSON_OBJECT,["name",detail1]),
     "footer",llList2Json(JSON_OBJECT,["text",region_avatar_list()])])])];
