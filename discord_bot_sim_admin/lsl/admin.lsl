@@ -21,14 +21,13 @@ string pos(string position)
 }
 string get_sim_analysis()
 {
-    string report;
     
     list List = llGetAgentList(AGENT_LIST_REGION,[]);
     
     integer agent = llGetListLength(List);
     integer x;
 
-    report +=
+    string report =
     "\n"+
     "Prims used: "+(string)llGetParcelPrimCount(llGetPos(),PARCEL_COUNT_TOTAL,FALSE)+"/"+(string)llGetParcelMaxPrims(llGetPos(),FALSE)+"\n"+
     "Prims left: "+(string)(llGetParcelMaxPrims(llGetPos(),FALSE) - (integer)llGetParcelPrimCount(llGetPos(),PARCEL_COUNT_TOTAL,FALSE))+"\n\n";
@@ -72,16 +71,16 @@ string get_avatar_analysis(key ID)
     string ARC      = llList2String(avatar_details, 2); 
     integer sMem    = llList2Integer(avatar_details, 3);
 
-    string report = "Name: " + avName + "\n"
-                  + "Attachments: " + (string)Length + "\n"
-                  + "Scripts Count: " + sCount + "\n"
-                  + "Memory usage: " + formatMemory(sMem) + "\n"
-                  + "Complexity: " + ARC + "\n"
-                  + "Attachment List Details:\n";
+    string report = "\n"
+                  + "name: " + avName + "\n\n"
+                  + "scripts count: " + sCount + "\n"
+                  + "memory usage: " + formatMemory(sMem) + "\n"
+                  + "complexity: " + ARC + "\n\n"
+                  + "attachments: " + (string)Length + "\n";
 
     if (!Length)
     {
-        report += "No attachments found.";
+        report += "no attachments.";
         return report;
     }
     integer x = 0;
@@ -96,9 +95,9 @@ string get_avatar_analysis(key ID)
         key attachID = llList2Key(attachments, x);
         list details = llGetObjectDetails(attachID, [OBJECT_NAME, OBJECT_TOTAL_SCRIPT_COUNT, OBJECT_STREAMING_COST]);
         
-        report += "• " + llList2String(details, 0) 
-                + " (Scripts: " + llList2String(details, 1) 
-                + " | Streaming Cost: " + llList2String(details, 2) + ")\n";
+        report += llList2String(details, 0) 
+                + " (scripts: " + llList2String(details, 1) 
+                + " | streaming cost: " + llList2String(details, 2) + ")\n";
     }
     return report;
 }
@@ -121,15 +120,15 @@ default
 {
     on_rez(integer start_param) 
     {
-        llResetScript();
+      llResetScript();
     }
     changed(integer change)
     {
-        if (change & CHANGED_REGION_START) { llResetScript(); }
+      if(change & CHANGED_REGION_START) { llResetScript(); }
     }
     state_entry()
     {
-        keyurl = llRequestURL();
+      keyurl = llRequestURL();
     }
     http_request(key id, string method, string body)
     {
@@ -137,8 +136,8 @@ default
         
         if ((method == URL_REQUEST_GRANTED) && (id == keyurl) )
         {
-        webhook_send("url",(string)body); 
-        keyurl = NULL_KEY;
+          webhook_send("url",(string)body); 
+          keyurl = NULL_KEY;
         }
         if (method == "POST")
         {
