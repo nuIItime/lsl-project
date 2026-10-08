@@ -1,0 +1,18 @@
+{
+    "token": "xxxx",
+    "guild_id": 0,
+    "simhosts": [
+        {
+            "name": "sim 1",
+            "url": "http://simhost"
+        },
+        {
+            "name": "sim 2",
+            "url": "http://simhost"
+        }
+    ],
+    "protected_uuids": [
+       "00000000-0000-0000-0000-000000000000",
+       "00000000-0000-0000-0000-000000000000"
+    ]
+}
