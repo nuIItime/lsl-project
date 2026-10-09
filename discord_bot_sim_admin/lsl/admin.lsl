@@ -24,8 +24,8 @@ string get_sim_analysis()
     
     list List = llGetAgentList(AGENT_LIST_REGION,[]);
     
-    integer agent = llGetListLength(List);
     integer x;
+    integer agent = llGetListLength(List);
 
     string report =
     "\n"+
@@ -35,7 +35,7 @@ string get_sim_analysis()
     report +=
     "Time dilation: "+(string)llRound((1-llGetRegionTimeDilation())*100)+"\n"+
     "Fps: "+llDeleteSubString((string)llGetRegionFPS(),4,100)+"\n\n"+
-    "Agent : "+(string)agent+"\n"
+    "Agent: "+(string)agent+"\n"
     ;
 
     if(!agent){ return report; }
