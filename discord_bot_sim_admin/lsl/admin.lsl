@@ -86,16 +86,15 @@ string get_avatar_analysis(key ID)
     integer x = 0;
     for (; x < Length; x += 1)
     {
-        if(llStringLength(report) > 1700)
+        if(llStringLength(report) > 2000)
         {
             report += "...";
             return report;
         }
-        
         key attachID = llList2Key(attachments, x);
         list details = llGetObjectDetails(attachID, [OBJECT_NAME, OBJECT_TOTAL_SCRIPT_COUNT, OBJECT_STREAMING_COST]);
         
-        report += llList2String(details, 0) 
+        report += llDeleteSubString(llList2String(details, 0),30,1000000)
                 + " (scripts: " + llList2String(details, 1) 
                 + " | streaming cost: " + llList2String(details, 2) + ")\n";
     }
