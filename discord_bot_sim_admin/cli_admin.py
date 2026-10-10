@@ -25,7 +25,7 @@ def submit_information_to_single_url(name, url, parameters):
     try:
         encoded_params = urllib.parse.urlencode(parameters).encode("utf-8")
         req = urllib.request.Request(url, data=encoded_params)
-        with urllib.request.urlopen(req, timeout=5) as response:
+        with urllib.request.urlopen(req, timeout=20) as response:
             return f"**[{name}]**:\n{response.read().decode('utf-8')}"
     except Exception as e:
         return f"**[{name}]**: Error -> {str(e)}"
