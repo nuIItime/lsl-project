@@ -146,4 +146,11 @@ async def cmd_estate_unbanned(interaction: discord.Interaction, input_uuid: str,
 async def cmd_estate_banned(interaction: discord.Interaction, input_uuid: str, sim: str):
     await handle_command_logic(interaction, 'banned', input_uuid, sim)
 
-client.run(TOKEN)
+while True:
+    try:
+        print("Attempting to launch the Discord bot...")
+        client.run(TOKEN)
+    except Exception as e:
+        print(f"Bot disconnected or failed to start: {e}")
+        print("Retrying script boot in 15 seconds...")
+        time.sleep(15)
